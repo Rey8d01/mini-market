@@ -13,10 +13,22 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url, include
-from django.contrib import admin
+from django.conf.urls import url
+from .views import ItemViewSet, OrdersViewSet, CartViewSet
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^_/', include('backend.urls')),
+    # /home
+    # url(r'^catalogs/$', ItemList.as_view()),
+    # /items
+    url(r'^items/$', ItemViewSet.as_view({'get': 'list'})),
+    url(r'^items/(?P<pk>[0-9]+)/$', ItemViewSet.as_view({'get': 'retrieve'})),
+
+    url(r'^orders/$', OrdersViewSet.as_view({'get': 'list'})),
+    # /cart
+    url(r'^cart/$', CartViewSet.as_view({'get': 'retrieve'})),
+
+    # /catalog/:catalogAlias/:page?tags
+    # /signin
+    # /signup
+
 ]
