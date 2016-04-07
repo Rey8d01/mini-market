@@ -9,16 +9,18 @@ class ItemViewSet(viewsets.ModelViewSet):
 
 
 class OrdersViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
+    # queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
-    # def get_queryset(self):
-    #     # Order.objects.filter(user=).all()
-    #     Order.objects.all()
-    #     queryset = super(UserPostList, self).get_queryset()
-    #     return queryset.filter(author__username=self.kwargs.get('username'))
+    def get_queryset(self):
+        user = self.request.user
+        return Order.objects.filter(user=user)
 
 
 class CartViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
+    # queryset = Order.objects.all()
     serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Order.objects.filter(user=user, state=Order.STATE_CART)
