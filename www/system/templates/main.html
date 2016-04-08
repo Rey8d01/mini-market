@@ -1,0 +1,45 @@
+<div id="right-top-menu">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 text-right affix">
+                <button ng-click="signoutButton()" type="button" class="btn btn-link"><i class="fa fa-sign-out"></i> Выход</button>
+                <button ng-click="signinButton()" type="button" class="btn btn-link"><i class="fa fa-sign-out"></i> Войти</button>
+                <button ng-click="signupButton()" type="button" class="btn btn-link"><i class="fa fa-sign-out"></i> Регистрация</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- main page -->
+<div id="wrapper">
+    <!-- title -->
+    <div id="masthead">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-7">
+                    <h1>{{main.title}}</h1>
+                    <h3><a ui-sref="main.home">Главная</a></h3>
+                </div>
+                <div class="col-md-5">
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end title -->
+
+    <!-- main container -->
+    <div class="container">
+        <div class="row">
+            <!-- content -->
+            <div class="col-md-12">
+                <div progress-bar progress="main.contentLoad"></div>
+                <div ui-view="content"></div>
+            </div>
+            <!-- end content -->
+        </div>
+
+    </div>
+    <!-- end main container -->
+
+</div>
+<!-- end main page -->

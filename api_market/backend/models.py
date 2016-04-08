@@ -7,7 +7,7 @@ class User(AbstractBaseUser):
     first_name = models.CharField(max_length=200, blank=True)
     last_name = models.CharField(max_length=200, blank=True)
     sex = models.CharField(max_length=6, blank=True)
-    birthday = models.DateField(null=True)
+    birthday = models.DateField(blank=True)
     address = models.CharField(max_length=255, blank=True)
     auth_time = models.DateTimeField(auto_now_add=True)
     request_time = models.DateTimeField(auto_now_add=True)

@@ -1,0 +1,19 @@
+
+<div class="alert alert-info" role="alert" ng-if="products && !products.length">Продуктов не найдено</div>
+
+<div class="row" ng-repeat="product in products">
+    <br>
+    <div class="col-md-2 col-md-3 text-center">
+        <a class="story-img" href="#"><img src="//placehold.it/100" style="width:100px;height:100px" class="img-circle"></a>
+    </div>
+    <div class="col-md-10 col-md-9">
+        <h3>{{product.title}}</h3>
+        <div ng-bind-html="product.description"></div>
+        <p class="lead">
+            <a class="btn btn-default" ng-click="addToCart()">В корзину</a>
+        </p>
+    </div>
+</div>
+
+<div paging page="paginationData.currentPage" page-size="paginationData.pageSize" total="paginationData.total"
+     ui-state="state" ui-state-params="{catalogAlias: catalogAlias, page: paginationData.currentPage}"></div>
