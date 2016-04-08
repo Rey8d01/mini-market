@@ -56,9 +56,9 @@ class AuthView(APIView):
         user.full_clean()
         user.save()
 
-        user.backend = 'django.contrib.auth.backends.ModelBackend'
+        user.backend = 'backend.backends.ModelBackend'
         login(request, user)
-        return Response(UserSerializer(request.user).data)
+        return Response({'auth': UserSerializer(request.user).data})
 
     def post(self, request, *args, **kwargs):
         """Авторизация"""
@@ -67,11 +67,8 @@ class AuthView(APIView):
 
         user = authenticate(username=email, password=password)
         if user is not None:
-            if user.is_active:
-                login(request, user)
-                return Response(UserSerializer(request.user).data)
-            else:
-                raise exceptions.NotAuthenticated('wrong user')
+            login(request, user)
+            return Response({"auth": UserSerializer(request.user).data})
         else:
             raise exceptions.NotAuthenticated('wrong password or email')
 

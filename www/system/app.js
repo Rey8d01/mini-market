@@ -227,9 +227,7 @@ chimera.system.auth.controller("AuthController", ["$scope", "$state", "authServi
         $scope.signupButton = function () {
             if ($scope.password == $scope.passwordConfirm) {
                 authService.signup($scope.email, $scope.password, $scope.passwordConfirm).then(function (response) {
-                    if (response.error.code == 0) {
-                        $state.go("main.home");
-                    }
+                    $state.go("main.home");
                 });
             } else {
                 $.notify("Поля подтверждение и пароль не совпдают", "error");
@@ -238,9 +236,7 @@ chimera.system.auth.controller("AuthController", ["$scope", "$state", "authServi
 
         $scope.signinButton = function () {
             authService.signin($scope.email, $scope.password).then(function (response) {
-                if (response.error.code == 0) {
-                    $state.go("main.home");
-                }
+                $state.go("main.home");
             });
         };
     }
@@ -279,7 +275,7 @@ chimera.system.auth.factory("authService", ["$q", "$http",
             },
             // Выход
             signout: function () {
-                $http.get("/signout");
+                $http.delete("/auth");
             },
             // Проверка статуса авторизации
             status: function() {
