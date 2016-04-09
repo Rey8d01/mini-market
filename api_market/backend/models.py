@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser
 
 
 class User(AbstractBaseUser):
+    """Пользователи системы."""
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=200, blank=True)
     last_name = models.CharField(max_length=200, blank=True)
@@ -25,6 +26,7 @@ class User(AbstractBaseUser):
 
 
 class Item(models.Model):
+    """Товары."""
     title = models.CharField(max_length=200)
     description = models.TextField()
     amount = models.IntegerField()
@@ -37,6 +39,7 @@ class Item(models.Model):
 
 
 class Order(models.Model):
+    """Заказы (Корзина)."""
     items = models.ManyToManyField(Item, through='OrderItem', through_fields=('order_id', 'item_id'))
     user = models.ForeignKey(User)
     state = models.IntegerField(default=1)
@@ -52,6 +55,7 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
+    """Товары в заказах."""
     order = models.ForeignKey(Order)
     item = models.ForeignKey(Item)
     count_item = models.IntegerField()
