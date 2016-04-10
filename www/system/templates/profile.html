@@ -1,0 +1,39 @@
+<div class="row">
+    <div class="col-md-8">
+
+        <div class="row">
+            <h3>Профиль</h3>
+            <div class="col-md-12">
+                <p>
+                    <input type="text" class="form-control" ng-model="user.data.first_name" placeholder="Имя">
+                </p>
+                <p>
+                    <input type="text" class="form-control" ng-model="user.data.last_name" placeholder="Фамилия">
+                </p>
+                <p>
+                    <select class="form-control" ng-model="user.data.sex">
+                        <option value="">-Укажите пол-</option>
+                        <option value="male">Мужской</option>
+                        <option value="female">Женский</option>
+                    </select>
+                </p>
+                <p>
+                    <textarea class="form-control" ng-model="user.data.address" placeholder="Адрес"></textarea>
+                </p>
+            </div>
+            <button type="button" class="btn btn-success" ng-click="saveUserInfoButton()">Сохранить</button>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Список заказов</h3>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div ui-view="cart"></div>
+    </div>
+</div>
+

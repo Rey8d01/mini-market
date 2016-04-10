@@ -1,8 +1,17 @@
-<h3>Список товаров</h3>
+<div class="row">
+    <div class="col-md-8">
+        <h3>Список товаров</h3>
 
-<h3>{{catalog.title}}</h3>
+        <h3>{{catalog.title}}</h3>
 
-<div>
-    <div class="alert alert-danger" role="alert" ng-if="catalog.error">{{catalog.error}}</div>
-    <div list-products products="catalog.products" pagination-data="catalog.pageData" catalog-alias="catalog.alias" state="main.catalog"></div>
+        <div>
+            <div list-products products="catalog.products" pagination-data="catalog.pageData" catalog-alias="catalog.alias"
+                 state="main.catalog" add-to-cart="addToCart"></div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div ui-view="cart"></div>
+    </div>
 </div>
+

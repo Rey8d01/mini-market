@@ -3,14 +3,14 @@
 
 <div class="row" ng-repeat="product in products">
     <br>
-    <div class="col-md-2 col-md-3 text-center">
+    <div class="col-md-3 text-center">
         <a class="story-img" href="#"><img src="//placehold.it/100" style="width:100px;height:100px" class="img-circle"></a>
     </div>
-    <div class="col-md-10 col-md-9">
+    <div class="col-md-9">
         <h3>{{product.title}}</h3>
         <div ng-bind-html="product.description"></div>
         <p class="lead">
-            <a class="btn btn-default" ng-click="addToCart()">В корзину</a>
+            <a class="btn btn-default" ng-click="addToCart(product.id)">В корзину</a>
         </p>
     </div>
 </div>

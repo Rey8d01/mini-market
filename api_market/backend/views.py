@@ -1,9 +1,9 @@
 from rest_framework import exceptions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import viewsets
+from rest_framework import viewsets, generics, permissions
 from .serializers import ItemSerializer, OrderSerializer, UserSerializer
-from .models import Item, Order, User
+from .models import Item, Order, User, OrderItem
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import AnonymousUser
 
@@ -35,12 +35,60 @@ class CartViewSet(viewsets.ModelViewSet):
         return Order.objects.filter(user=user, state=Order.STATE_CART)
 
 
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    model = User
+    serializer_class = UserSerializer
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    def get_queryset(self):
+        return self.request.user
+
+    def get_object(self):
+        return self.request.user
+
+
+class CartDetail(generics.RetrieveUpdateDestroyAPIView):
+    model = Order
+    serializer_class = OrderSerializer
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    def post(self, request, *args, **kwargs):
+        product = self.request.data["product"]
+        product = Item.objects.get(pk=product)
+        cart = self.get_object()
+
+        try:
+            order_item = OrderItem.objects.get(order=cart, item=product)
+            order_item.count_item += 1
+        except OrderItem.DoesNotExist:
+            order_item = OrderItem(order=cart, item=product)
+        order_item.save()
+
+        return Response(OrderSerializer(cart).data)
+
+    def put(self, request, *args, **kwargs):
+        print('put')
+
+    def get_queryset(self):
+        """Получение товаров в заказе со статусом 1 для авторизованного пользователя."""
+        user = self.request.user
+        return Order.objects.filter(user=user)
+
+    def get_object(self):
+        """Получение товаров в заказе со статусом 1 для авторизованного пользователя."""
+        user = self.request.user
+        return Order().get_cart(user)
+
+
 class AuthView(APIView):
     """AAA"""
 
     def get(self, request, *args, **kwargs):
         """Получение информации по авторизованному пользователю."""
-        print(request.user)
         if isinstance(request.user, AnonymousUser):
             return Response({'auth': ""})
         return Response({'auth': UserSerializer(request.user).data})

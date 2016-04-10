@@ -1,0 +1,14 @@
+<h3>Корзина</h3>
+<div ng-if="cart.items">
+    <div class="row" ng-repeat="product in cart.items">
+        <div class="col-md-12">
+            <h5>{{product.title}}</h5>
+        </div>
+    </div>
+
+    <a class="btn btn-success" ui-sref="main.order">Оформить заказ</a>
+</div>
+
+<div ng-if="!cart.items">
+    <p>Корзина пуста</p>
+</div>

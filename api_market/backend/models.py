@@ -8,7 +8,6 @@ class User(AbstractBaseUser):
     first_name = models.CharField(max_length=200, blank=True)
     last_name = models.CharField(max_length=200, blank=True)
     sex = models.CharField(max_length=6, blank=True)
-    birthday = models.DateField(blank=True)
     address = models.CharField(max_length=255, blank=True)
     auth_time = models.DateTimeField(auto_now_add=True)
     request_time = models.DateTimeField(auto_now_add=True)
@@ -43,10 +42,10 @@ class Item(models.Model):
 
 class Order(models.Model):
     """Заказы (Корзина)."""
-    items = models.ManyToManyField(Item, through='OrderItem', through_fields=('order_id', 'item_id'))
+    items = models.ManyToManyField(Item, through='OrderItem')
     user = models.ForeignKey(User)
     state = models.IntegerField(default=1)
-    fixed_amount = models.IntegerField()
+    fixed_amount = models.IntegerField(default=0)
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
 
@@ -57,12 +56,30 @@ class Order(models.Model):
     STATE_CANCEL = 4
     STATE_COMPLETE = 5
 
+    def get_cart(self, user):
+        """Вернет модель заказа в статусе для корзины."""
+        try:
+            order = Order.objects.get(user=user, state=self.STATE_CART)
+        except self.DoesNotExist:
+            order = Order(user=user, state=self.STATE_CART)
+            order.save()
+        return order
+
+    def add_item_to_cart(self, product):
+        """Добавление товара к корзине пользователя."""
+        try:
+            order_item = OrderItem.objects.get(order=self, item=product)
+            order_item.count_item += 1
+        except OrderItem.DoesNotExist:
+            order_item = OrderItem(order=self, item=product)
+        order_item.save()
+
 
 class OrderItem(models.Model):
     """Товары в заказах."""
-    order = models.ForeignKey(Order)
-    item = models.ForeignKey(Item)
-    count_item = models.IntegerField()
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    count_item = models.IntegerField(default=1)
 
 
 class Catalog(models.Model):

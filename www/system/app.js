@@ -19,7 +19,8 @@ var chimera = {
 chimera.system.main = angular.module("main", [
     "ui.router",
     "market",
-    "auth"
+    "auth",
+    "user",
 ]);
 
 /**
@@ -145,6 +146,10 @@ chimera.system.main.config(["$stateProvider", "$urlRouterProvider", "$locationPr
                     "content": {
                         templateUrl: "/system/templates/catalogItem.html",
                         controller: "CatalogItemController"
+                    },
+                    "cart@main.home": {
+                        templateUrl: "/system/templates/cart.html",
+                        controller: "CartController"
                     }
                 }
             })
@@ -167,16 +172,33 @@ chimera.system.main.config(["$stateProvider", "$urlRouterProvider", "$locationPr
                     "content": {
                         templateUrl: "/system/templates/catalogItem.html",
                         controller: "CatalogItemController"
+                    },
+                    "cart@main.catalog": {
+                        templateUrl: "/system/templates/cart.html",
+                        controller: "CartController"
                     }
                 }
             })
-            .state("main.orders", {
-                url: "/orders",
+            .state("main.profile", {
+                url: "/profile",
                 views: {
                     "content": {
-                        templateUrl: "/system/templates/orders.html",
-                        controller: "OrdersController"
+                        templateUrl: "/system/templates/profile.html",
+                        controller: "UserController"
+                    },
+                    "cart@main.profile": {
+                        templateUrl: "/system/templates/cart.html",
+                        controller: "CartController"
                     }
+                }
+            })
+            .state("main.order", {
+                url: "/order",
+                views: {
+                    "content": {
+                        templateUrl: "/system/templates/order.html",
+                        controller: "OrderController"
+                    },
                 }
             })
         ;
@@ -187,8 +209,8 @@ chimera.system.main.config(["$stateProvider", "$urlRouterProvider", "$locationPr
 /**
  * Базовый контроллер.
  */
-chimera.system.main.controller("ChimeraController", ["$scope", "$state", "authService",
-    function ($scope, $state, authService) {
+chimera.system.main.controller("ChimeraController", ["$scope", "$state", "authService", "cartService",
+    function ($scope, $state, authService, cartService) {
         $scope.main = {
             "title": "Mini-market",
             "contentLoad": false,
@@ -229,6 +251,26 @@ chimera.system.main.controller("ChimeraController", ["$scope", "$state", "authSe
         $scope.signupButton = function () {
             $state.go("signup");
         };
+    }
+]);
+
+chimera.system.user = angular.module('user', []);
+
+chimera.system.user.controller("UserController", ["$scope", "$state", "userService",
+    function ($scope, $state, userService) {
+        $scope.saveUserInfoButton = function () {
+            userService.update($scope.user.data, function (response) {
+                $.notify("Информация сохранена", "success");
+            });
+        };
+    }
+]);
+
+chimera.system.user.factory("userService", ["$resource",
+    function ($resource) {
+        return $resource("/profile", null, {
+            "update": {method:"PUT"}
+        });
     }
 ]);
 

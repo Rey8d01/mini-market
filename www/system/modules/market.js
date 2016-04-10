@@ -1,12 +1,35 @@
 chimera.system.market = angular.module("market", ["ngResource", "ngSanitize"]);
 
-chimera.system.market.controller("CatalogItemController", ["$scope", "$state", "catalogItemService",
-    function ($scope, $state, catalogItemService) {
+chimera.system.market.controller("CartController", ["$scope", "cartService",
+    function ($scope, cartService) {
+        // Информация по корзине.
+        $scope.cart = {};
+        if ($scope.user.auth) {
+            cartService.get({}, function(response) {
+                $scope.cart = response;
+            });
+        }
+    }
+]);
+
+chimera.system.market.controller("OrderController", ["$scope", "cartService",
+    function ($scope, cartService) {
+        // Информация по корзине.
+        $scope.cart = {};
+        cartService.get({}, function(response) {
+            $scope.cart = response;
+        });
+    }
+]);
+
+chimera.system.market.controller("CatalogItemController", ["$scope", "$state", "catalogItemService", "cartService",
+    function ($scope, $state, catalogItemService, cartService) {
+        var page = $state.params.page;
         $scope.catalog = {
             title: "Общий каталог",
             alias: "some"
         };
-        var page = $state.params.page;
+        $scope.cart = {};
 
         $scope.main.blogContentLoad = true;
 //        catalogItemService.get({catalogAlias: $state.params.catalogAlias, page: $state.params.page}, function (response) {
@@ -19,6 +42,24 @@ chimera.system.market.controller("CatalogItemController", ["$scope", "$state", "
             $scope.catalog.products = response.results;
             $scope.main.blogContentLoad = false;
         });
+
+        // Информация по корзине.
+        if ($scope.user.auth) {
+            cartService.get({}, function(response) {
+                $scope.cart = response
+            })
+        }
+
+        // Добавить товар в корзину.
+        $scope.addToCart = function(productId) {
+            if ($scope.user.auth) {
+                cartService.save({product: productId}, function(response) {
+                    $scope.cart = response
+                })
+            } else {
+                $.notify("Вам необходимо войти в систему под зарегистрированной учетной записью");
+            }
+        }
     }
 ]);
 
@@ -37,5 +78,11 @@ chimera.system.market.factory("catalogItemService", ["$resource",
 chimera.system.market.factory("catalogListService", ["$resource",
     function ($resource) {
         return $resource("/catalog-list");
+    }
+]);
+
+chimera.system.market.factory("cartService", ["$resource",
+    function ($resource) {
+        return $resource("/cart");
     }
 ]);

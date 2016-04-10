@@ -1,0 +1,20 @@
+<div class="row">
+    <div class="col-md-12">
+        <h3>Список товаров в корзине</h3>
+
+        <ul class="row" ng-repeat="product in cart.items">
+            <li>
+                {{product.title}}
+                <button type="button" class="btn btn-default btn-xs">+</button>
+                <span>#</span>
+                <button type="button" class="btn btn-default btn-xs">-</button>
+                <button type="button" class="btn btn-default btn-xs">Удалить</button>
+            </li>
+        </ul>
+
+        <p>Сумма заказа: №</p>
+
+        <button type="button" class="btn btn-success" ui-sref="main.order">Подтвердить заказ</button>
+    </div>
+</div>
+
