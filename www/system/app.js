@@ -67,19 +67,13 @@ chimera.system.main.factory("sessionRecover", ["$q", "$location", function ($q, 
          * @returns {*}
          */
         response: function (response) {
-            var data = response.data;
-
-            if (data && data.error && data.error.code) {
-                parseError(data.error);
-            }
-
             return response;
         },
         responseError: function (rejection) {
             var data = rejection.data;
 
-            if (data && data.error && data.error.code) {
-                parseError(data.error);
+            if (data && data.detail) {
+                $.notify(data.detail, "error");
             } else {
                 $.notify("Что то пошло не так", "error");
             }
@@ -93,6 +87,11 @@ chimera.system.main.config(["$stateProvider", "$urlRouterProvider", "$locationPr
     function ($stateProvider, $urlRouterProvider, $locationProvider, $httpProvider) {
         // Перехват всех http запросов для определения ошибок и реакции на них.
         $httpProvider.interceptors.push("sessionRecover");
+
+        // https://docs.djangoproject.com/en/dev/ref/csrf/#ajax
+        $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+        $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+
         // html5Mode - без # в урле
         $locationProvider.html5Mode({
             enabled: true,
@@ -208,6 +207,10 @@ chimera.system.main.controller("ChimeraController", ["$scope", "$state", "authSe
         $scope.signupButton = function () {
             $state.go("signup");
         };
+
+        $scope.sButton = function () {
+            authService.status();
+        };
     }
 ]);
 
@@ -245,7 +248,7 @@ chimera.system.auth.controller("AuthController", ["$scope", "$state", "authServi
 chimera.system.auth.factory("authService", ["$q", "$http",
     function ($q, $http) {
         return {
-            // Авторизация
+            // Авторизация.
             signin: function (email, password) {
                 var deferred = $q.defer();
 
@@ -259,7 +262,7 @@ chimera.system.auth.factory("authService", ["$q", "$http",
 
                 return deferred.promise;
             },
-            // Регистрация
+            // Регистрация.
             signup: function (email, password, passwordConfirm) {
                 var deferred = $q.defer();
 
@@ -273,13 +276,13 @@ chimera.system.auth.factory("authService", ["$q", "$http",
 
                 return deferred.promise;
             },
-            // Выход
+            // Выход.
             signout: function () {
                 $http.delete("/auth");
             },
-            // Проверка статуса авторизации
+            // Проверка статуса авторизации.
             status: function() {
-
+                $http.get("/auth");
             }
         }
 

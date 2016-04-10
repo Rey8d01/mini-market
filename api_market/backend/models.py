@@ -15,6 +15,8 @@ class User(AbstractBaseUser):
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
 
+    USERNAME_FIELD = "email"
+
     def get_full_name(self):
         return self.first_name + " " + self.last_name
 
@@ -33,6 +35,7 @@ class Item(models.Model):
     is_active = models.BooleanField(default=False)
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
+    # catalog = models.ForeignKey(CatalogItem)
 
     def __str__(self):
         return self.title
@@ -47,6 +50,7 @@ class Order(models.Model):
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
 
+    """Статусы заказов. Изменяются в зависимости действий пользователя или менеджера."""
     STATE_CART = 1
     STATE_CONFIRMED = 2
     STATE_SHIPPING = 3
@@ -59,3 +63,23 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order)
     item = models.ForeignKey(Item)
     count_item = models.IntegerField()
+
+
+class Catalog(models.Model):
+    """Каталоги товаров."""
+    alias = models.CharField(max_length=200)
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    # items = models.ManyToManyField(Item, through='OrderItem', through_fields=('order_id', 'item_id'))
+
+
+class CatalogItem(models.Model):
+    """Закрепление товаров за каталогом.
+
+    Связь между каталогом и товаром 1-М можно обеспечить наличием соответствующего поля в модели Item,
+       однако данный вариант позволяет избавиться от null значений у товаров без категории. Кроме того
+       в данном виде возможен переход к связи М-М тем самым обеспечив нахождение товара в нескольких каталогах.
+
+    """
+    item = models.OneToOneField(Item)
+    catalog = models.ForeignKey(Catalog)

@@ -42,8 +42,8 @@ INSTALLED_APPS = [
 ]
 
 AUTHENTICATION_BACKENDS = (
-    'backend.backends.ModelBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'backend.backends.ModelBackend',
 )
 
 REST_FRAMEWORK = {

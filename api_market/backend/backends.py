@@ -1,7 +1,7 @@
 from .models import User
 
 
-class ModelBackend(object):
+class ModelBackend:
     def authenticate(self, username=None, password=None):
         if username is not None:
             user = User.objects.get(email=username)
@@ -9,3 +9,6 @@ class ModelBackend(object):
                 return user
 
         return None
+
+    def get_user(self, user_id):
+        return User.objects.get(pk=user_id)
