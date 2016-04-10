@@ -195,9 +195,31 @@ chimera.system.main.controller("ChimeraController", ["$scope", "$state", "authSe
             "foo": "BAAAAAR"
         };
 
+        // Пользовательская информация.
+        $scope.user = {
+            auth: false,
+            data: {}
+        };
+
+        authService.status().then(function (response) {
+            $scope.user = {
+                auth: true,
+                data: response.auth
+            };
+        }, function (response) {
+            $scope.user = {
+                auth: false,
+                data: {}
+            };
+        });
+
         $scope.signoutButton = function () {
             authService.signout();
             $state.go("signin");
+            $scope.user = {
+                auth: false,
+                data: {}
+            };
         };
 
         $scope.signinButton = function () {
@@ -206,10 +228,6 @@ chimera.system.main.controller("ChimeraController", ["$scope", "$state", "authSe
 
         $scope.signupButton = function () {
             $state.go("signup");
-        };
-
-        $scope.sButton = function () {
-            authService.status();
         };
     }
 ]);
@@ -247,33 +265,28 @@ chimera.system.auth.controller("AuthController", ["$scope", "$state", "authServi
 
 chimera.system.auth.factory("authService", ["$q", "$http",
     function ($q, $http) {
+        // Общая функция успешной обработки для всех запросов авторизации.
+        var fnSuccess = function(deferred) {
+            return function (data, status, headers, config) {
+                if (data && data.auth) {
+                    deferred.resolve(data);
+                } else {
+                    deferred.reject(data);
+                }
+            };
+        };
+
         return {
             // Авторизация.
             signin: function (email, password) {
                 var deferred = $q.defer();
-
-                $http.post("/auth", {email: email, password: password}).success(function (data, status, headers, config) {
-                    if (data && data.auth) {
-                        deferred.resolve(data);
-                    } else {
-                        deferred.reject(data);
-                    }
-                });
-
+                $http.post("/auth", {email: email, password: password}).success(fnSuccess(deferred));
                 return deferred.promise;
             },
             // Регистрация.
             signup: function (email, password, passwordConfirm) {
                 var deferred = $q.defer();
-
-                $http.put("/auth", {email: email, password: password, passwordConfirm: passwordConfirm}).success(function (data, status, headers, config) {
-                    if (data && data.auth) {
-                        deferred.resolve(data);
-                    } else {
-                        deferred.reject(data);
-                    }
-                });
-
+                $http.put("/auth", {email: email, password: password, passwordConfirm: passwordConfirm}).success(fnSuccess(deferred));
                 return deferred.promise;
             },
             // Выход.
@@ -282,9 +295,10 @@ chimera.system.auth.factory("authService", ["$q", "$http",
             },
             // Проверка статуса авторизации.
             status: function() {
-                $http.get("/auth");
+                var deferred = $q.defer();
+                $http.get("/auth").success(fnSuccess(deferred));
+                return deferred.promise;
             }
-        }
-
+        };
     }
 ]);

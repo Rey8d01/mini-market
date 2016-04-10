@@ -2,10 +2,14 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12 text-right affix">
-                <button ng-click="signoutButton()" type="button" class="btn btn-link"><i class="fa fa-sign-out"></i> Выход</button>
-                <button ng-click="signinButton()" type="button" class="btn btn-link"><i class="fa fa-sign-out"></i> Войти</button>
-                <button ng-click="signupButton()" type="button" class="btn btn-link"><i class="fa fa-sign-out"></i> Регистрация</button>
-                <button ng-click="sButton()" type="button" class="btn btn-link"><i class="fa fa-sign-out"></i> S</button>
+                <div ng-if="user.auth">
+                    <a class="btn btn-link" href="#">Профиль {{user.data.email}}</a>
+                    <button ng-click="signoutButton()" type="button" class="btn btn-link"><i class="fa fa-sign-out"></i> Выход</button>
+                </div>
+                <div ng-if="!user.auth">
+                    <button ng-click="signinButton()" type="button" class="btn btn-link"><i class="fa fa-sign-out"></i> Войти</button>
+                    <button ng-click="signupButton()" type="button" class="btn btn-link"><i class="fa fa-sign-out"></i> Регистрация</button>
+                </div>
             </div>
         </div>
     </div>
