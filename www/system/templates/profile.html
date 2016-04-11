@@ -28,12 +28,44 @@
             <div class="col-md-12">
                 <h3>Список заказов</h3>
 
+                <div class="row">
+                    <div class="col-md-12" ng-repeat="order in orders">
+                        <p>Заказ №{{order.id}} от {{order.create_time}} на суммму {{order.fixed_amount}} руб.</p>
+                        <ul>
+                            <li ng-repeat="product in order.products">{{product.title}} <span>{{product.count_product}} шт.</span></li>
+                        </ul>
+                        <div ng-switch="order.state">
+                            <span class="label label-default" ng-switch-when="4">Отменен</span>
+                            <span class="label label-primary" ng-switch-when="2">На обработке</span>
+                            <span class="label label-success" ng-switch-when="5">Завершен</span>
+                            <span class="label label-info" ng-switch-when="3">Отправлен</span>
+                            <button type="button" class="btn btn-default btn-xs" ng-switch-when="2" ng-click="cancelOrderButton(order.id)">Отменить заказ</button>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 
     <div class="col-md-4">
-        <div ui-view="cart"></div>
+
+        <h3>Корзина</h3>
+        <div ng-if="cart.products.length">
+            <div class="row" ng-repeat="product in cart.products">
+                <div class="col-md-12">
+                    <h5>{{product.title}} ({{product.count_product}})</h5>
+                </div>
+            </div>
+
+            <a class="btn btn-success" ui-sref="main.order">Оформить заказ</a>
+        </div>
+
+        <div ng-if="!cart.products.length">
+            <p>Корзина пуста</p>
+        </div>
+
     </div>
 </div>
 

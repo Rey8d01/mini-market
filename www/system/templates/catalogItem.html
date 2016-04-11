@@ -11,7 +11,22 @@
     </div>
 
     <div class="col-md-4">
-        <div ui-view="cart"></div>
+
+        <h3>Корзина</h3>
+        <div ng-if="cart.products.length">
+            <div class="row" ng-repeat="product in cart.products">
+                <div class="col-md-12">
+                    <h5>{{product.title}} ({{product.count_product}})</h5>
+                </div>
+            </div>
+
+            <a class="btn btn-success" ui-sref="main.order">Оформить заказ</a>
+        </div>
+
+        <div ng-if="!cart.products.length">
+            <p>Корзина пуста</p>
+        </div>
+
     </div>
 </div>
 

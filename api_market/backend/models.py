@@ -26,7 +26,7 @@ class User(AbstractBaseUser):
         return self.email
 
 
-class Item(models.Model):
+class Product(models.Model):
     """Товары."""
     title = models.CharField(max_length=200)
     description = models.TextField()
@@ -34,7 +34,7 @@ class Item(models.Model):
     is_active = models.BooleanField(default=False)
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
-    # catalog = models.ForeignKey(CatalogItem)
+    # catalog = models.ForeignKey(CatalogProduct)
 
     def __str__(self):
         return self.title
@@ -57,7 +57,7 @@ class Order(models.Model):
         (STATE_COMPLETE, "Завершен"),
     )
 
-    items = models.ManyToManyField(Item, through='OrderItem')
+    products = models.ManyToManyField(Product, through='OrderProduct')
     user = models.ForeignKey(User)
     state = models.IntegerField(default=STATE_CART, choices=STATES)
     fixed_amount = models.IntegerField(default=0)
@@ -69,9 +69,11 @@ class Order(models.Model):
         try:
             order = Order.objects.get(user=user, state=self.STATE_CART)
         except self.DoesNotExist:
+            # Создание новой корзины.
             order = Order(user=user, state=self.STATE_CART)
             order.save()
         except self.MultipleObjectsReturned:
+            # Фикс если у пользователя оказывается несколько корзин.
             orders = Order.objects.filter(user=user, state=self.STATE_CART).all()
             order = orders.last()
             for broken_order in orders:
@@ -80,11 +82,11 @@ class Order(models.Model):
         return order
 
 
-class OrderItem(models.Model):
+class OrderProduct(models.Model):
     """Товары в заказах."""
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    item = models.ForeignKey(Item, on_delete=models.CASCADE)
-    count_item = models.IntegerField(default=1)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    count_product = models.IntegerField(default=1)
 
 
 class Catalog(models.Model):
@@ -92,16 +94,15 @@ class Catalog(models.Model):
     alias = models.CharField(max_length=200)
     title = models.CharField(max_length=200)
     description = models.TextField()
-    # items = models.ManyToManyField(Item, through='OrderItem', through_fields=('order_id', 'item_id'))
 
 
-class CatalogItem(models.Model):
+class CatalogProduct(models.Model):
     """Закрепление товаров за каталогом.
 
-    Связь между каталогом и товаром 1-М можно обеспечить наличием соответствующего поля в модели Item,
+    Связь между каталогом и товаром 1-М можно обеспечить наличием соответствующего поля в модели Product,
        однако данный вариант позволяет избавиться от null значений у товаров без категории. Кроме того
        в данном виде возможен переход к связи М-М тем самым обеспечив нахождение товара в нескольких каталогах.
 
     """
-    item = models.OneToOneField(Item)
+    product = models.OneToOneField(Product)
     catalog = models.ForeignKey(Catalog)

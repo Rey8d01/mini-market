@@ -1,6 +1,6 @@
 chimera.system.market = angular.module("market", ["ngResource", "ngSanitize"]);
 
-chimera.system.market.controller("CartController", ["$scope", "cartService",
+chimera.system.market.controller("CartInfoController", ["$scope", "cartService",
     function ($scope, cartService) {
         // Информация по корзине.
         $scope.cart = {};
@@ -12,30 +12,44 @@ chimera.system.market.controller("CartController", ["$scope", "cartService",
     }
 ]);
 
-chimera.system.market.controller("OrderController", ["$scope", "$state", "cartService",
+chimera.system.market.controller("CartController", ["$scope", "$state", "cartService",
     function ($scope, $state, cartService) {
+        var calculateAmount = function(products) {
+            amount = 0;
+            for (i in products) {
+                product = products[i];
+                amount += product.count_product * product.amount;
+            }
+            console.log(amount);
+            return amount;
+        };
         // Информация по корзине.
         $scope.cart = {};
+        $scope.calculateAmount = 10;
         cartService.get({}, function(response) {
             $scope.cart = response;
+            $scope.calculateAmount = calculateAmount(response.products);
         });
 
         // Добавит 1 единицу товара.
         $scope.plusProductButton = function(productId) {
             cartService.save({product: productId, change: 1}, function(response) {
                 $scope.cart = response;
+                $scope.calculateAmount = calculateAmount(response.products);
             });
         }
         // Уберет 1 единицу товара.
         $scope.minusProductButton = function(productId) {
             cartService.save({product: productId, change: -1}, function(response) {
                 $scope.cart = response;
+                $scope.calculateAmount = calculateAmount(response.products);
             });
         }
         // Уберет товар из заказа.
         $scope.deleteProductButton = function(productId, change) {
             cartService.save({product: productId, change: -change}, function(response) {
                 $scope.cart = response;
+                $scope.calculateAmount = calculateAmount(response.products);
             });
         };
         // Подтверждение заказа.
@@ -72,7 +86,6 @@ chimera.system.market.controller("CatalogItemController", ["$scope", "$state", "
         if ($scope.user.auth) {
             cartService.get({}, function(response) {
                 $scope.cart = response;
-                $scope.$apply();
             });
         }
 
@@ -81,7 +94,6 @@ chimera.system.market.controller("CatalogItemController", ["$scope", "$state", "
             if ($scope.user.auth) {
                 cartService.save({product: productId}, function(response) {
                     $scope.cart = response;
-                    $scope.$apply();
                 });
             } else {
                 $.notify("Вам необходимо войти в систему под зарегистрированной учетной записью");
@@ -113,5 +125,11 @@ chimera.system.market.factory("cartService", ["$resource",
         return $resource("/cart", null, {
             "confirm": {method:"PUT"}
         });
+    }
+]);
+
+chimera.system.market.factory("orderService", ["$resource",
+    function ($resource) {
+        return $resource("/order/:orderId", {orderId: null});
     }
 ]);

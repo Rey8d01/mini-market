@@ -147,10 +147,6 @@ chimera.system.main.config(["$stateProvider", "$urlRouterProvider", "$locationPr
                         templateUrl: "/system/templates/catalogItem.html",
                         controller: "CatalogItemController"
                     },
-                    "cart@main.home": {
-                        templateUrl: "/system/templates/cart.html",
-                        controller: "CartController"
-                    }
                 }
             })
 //            .state("main.home", {
@@ -173,10 +169,6 @@ chimera.system.main.config(["$stateProvider", "$urlRouterProvider", "$locationPr
                         templateUrl: "/system/templates/catalogItem.html",
                         controller: "CatalogItemController"
                     },
-                    "cart@main.catalog": {
-                        templateUrl: "/system/templates/cart.html",
-                        controller: "CartController"
-                    }
                 }
             })
             .state("main.profile", {
@@ -186,10 +178,6 @@ chimera.system.main.config(["$stateProvider", "$urlRouterProvider", "$locationPr
                         templateUrl: "/system/templates/profile.html",
                         controller: "UserController"
                     },
-                    "cart@main.profile": {
-                        templateUrl: "/system/templates/cart.html",
-                        controller: "CartController"
-                    }
                 }
             })
             .state("main.order", {
@@ -197,7 +185,7 @@ chimera.system.main.config(["$stateProvider", "$urlRouterProvider", "$locationPr
                 views: {
                     "content": {
                         templateUrl: "/system/templates/order.html",
-                        controller: "OrderController"
+                        controller: "CartController"
                     },
                 }
             })
@@ -232,7 +220,6 @@ chimera.system.main.controller("ChimeraController", ["$scope", "$state", "authSe
             // После авторизации получение дополнительной информации - по корзине
             cartService.get({}, function(response) {
                 $scope.cart = response;
-                $scope.$apply();
             });
         }, function (response) {
             $scope.user = {
@@ -262,13 +249,26 @@ chimera.system.main.controller("ChimeraController", ["$scope", "$state", "authSe
 
 chimera.system.user = angular.module('user', []);
 
-chimera.system.user.controller("UserController", ["$scope", "$state", "userService",
-    function ($scope, $state, userService) {
+chimera.system.user.controller("UserController", ["$scope", "$state", "userService", "orderService",
+    function ($scope, $state, userService, orderService) {
+        $scope.orders = {};
+        orderService.get({}, function(response) {
+            $scope.orders = response.results;
+        });
+
+        // Сохранение пользовательской информации.
         $scope.saveUserInfoButton = function () {
             userService.update($scope.user.data, function (response) {
                 $.notify("Информация сохранена", "success");
             });
-        };
+        }
+
+        // Отмена заказа.
+        $scope.cancelOrderButton = function(orderId) {
+            orderService.delete({orderId: orderId}, function(response) {
+                $state.go("main.profile");
+            });
+        }
     }
 ]);
 

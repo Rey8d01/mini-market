@@ -1,11 +1,11 @@
 """Сериализаторы для API."""
 from rest_framework import serializers
-from .models import Item, Order, User, OrderItem
+from .models import Product, Order, User, OrderProduct
 
 
-class ItemSerializer(serializers.ModelSerializer):
+class ProductSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Item
+        model = Product
         fields = ('id', 'title', 'description', 'amount')
 
 
@@ -16,20 +16,22 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.HyperlinkedModelSerializer):
-    id = serializers.ReadOnlyField(source='item.id')
-    title = serializers.ReadOnlyField(source='item.title')
-    amount = serializers.ReadOnlyField(source='item.amount')
+    id = serializers.ReadOnlyField(source='product.id')
+    title = serializers.ReadOnlyField(source='product.title')
+    amount = serializers.ReadOnlyField(source='product.amount')
 
     class Meta:
-        model = OrderItem
-        fields = ('id', 'title', 'amount', 'count_item')
+        model = OrderProduct
+        fields = ('id', 'title', 'amount', 'count_product')
 
 
 class OrderSerializer(serializers.ModelSerializer):
     user = UserSerializer(required=True)
-    # items = ItemSerializer(many=True)  # Связь для М-М
-    items = OrderItemSerializer(source='orderitem_set', many=True)  # Связь для М-М через сериализатор таблицы-связки для получения доп инфы
+    # Связь для М-М
+    # products = ProductSerializer(many=True)
+    # Связь для М-М через сериализатор таблицы-связки для получения доп инфы
+    products = OrderItemSerializer(source='orderproduct_set', many=True)
 
     class Meta:
         model = Order
-        fields = ('id', 'state', 'fixed_amount', 'user', 'items')
+        fields = ('id', 'state', 'fixed_amount', 'user', 'products', 'create_time')

@@ -2,37 +2,35 @@ from rest_framework import exceptions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets, generics, permissions
-from .serializers import ItemSerializer, OrderSerializer, UserSerializer
-from .models import Item, Order, User, OrderItem
+from .serializers import ProductSerializer, OrderSerializer, UserSerializer
+from .models import Product, Order, User, OrderProduct
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import AnonymousUser
 
 
-class ItemViewSet(viewsets.ModelViewSet):
+class ProductViewSet(viewsets.ModelViewSet):
     """Список товаров в каталоге."""
-    serializer_class = ItemSerializer
+    serializer_class = ProductSerializer
 
     def get_queryset(self):
-        return Item.objects.filter(is_active=True)
+        return Product.objects.filter(is_active=True)
 
 
-class OrdersViewSet(viewsets.ModelViewSet):
+class OrderViewSet(viewsets.ModelViewSet):
     """Список заказов пользователя."""
     serializer_class = OrderSerializer
 
     def get_queryset(self):
         user = self.request.user
-        return Order.objects.filter(user=user)
+        return Order.objects.filter(user=user).exclude(state=Order.STATE_CART).order_by('-create_time')
 
-
-class CartViewSet(viewsets.ModelViewSet):
-    """Список товаров в корзине."""
-    serializer_class = OrderSerializer
-
-    def get_queryset(self):
-        """Получение товаров в заказе со статусом 1 для авторизованного пользователя."""
-        user = self.request.user
-        return Order.objects.filter(user=user, state=Order.STATE_CART)
+    def delete(self, request, *args, **kwargs):
+        """Отмена заказа, если он еще не отправлен."""
+        order_id = int(kwargs["order_id"])
+        order = Order.objects.get(id=order_id, user=self.request.user, state=Order.STATE_CONFIRMED)
+        order.state = Order.STATE_CANCEL
+        order.save()
+        return Response(OrderSerializer(order).data)
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -64,40 +62,33 @@ class CartDetail(generics.RetrieveUpdateDestroyAPIView):
             change = int(self.request.data["change"])
         except KeyError:
             change = 1
-        product = Item.objects.get(pk=product)
+        product = Product.objects.get(pk=product)
         cart = self.get_object()
 
         try:
-            order_item = OrderItem.objects.get(order=cart, item=product)
-            order_item.count_item += change
-        except OrderItem.DoesNotExist:
-            order_item = OrderItem(order=cart, item=product)
+            order_product = OrderProduct.objects.get(order=cart, product=product)
+            order_product.count_product += change
+        except OrderProduct.DoesNotExist:
+            order_product = OrderProduct(order=cart, product=product)
 
-        if order_item.count_item <= 0:
-            order_item.delete()
+        if order_product.count_product <= 0:
+            order_product.delete()
         else:
-            order_item.save()
+            order_product.save()
 
         return Response(OrderSerializer(cart).data)
 
     def put(self, request, *args, **kwargs):
         """Подтверждение статуса заказа пользователем."""
         cart = self.get_object()
-        if cart.items.count():
+        amount = sum([item_orderproduct.product.amount * item_orderproduct.count_product for item_orderproduct in cart.orderproduct_set.all()])
+        if amount:
+            cart.fixed_amount = amount
             cart.state = Order.STATE_CONFIRMED
             cart.save()
         else:
-            raise exceptions.APIException("В вашей корзине нет товаров")
-
+            raise exceptions.APIException("Ошибка при формировании заказа")
         return Response(OrderSerializer(cart).data)
-
-    def delete(self, request, *args, **kwargs):
-        """Отмена заказа, если он еще не отправлен."""
-        order_id = int(self.request.data["id"])
-        order = Order.objects.get(id=order_id, user=self.request.user, state=Order.STATE_CONFIRMED)
-        order.state = Order.STATE_CANCEL
-        order.save()
-        return Response(OrderSerializer(order).data)
 
     def get_queryset(self):
         """Получение товаров в заказе авторизованного пользователя."""

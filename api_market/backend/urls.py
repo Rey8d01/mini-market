@@ -14,20 +14,22 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-from .views import ItemViewSet, OrdersViewSet, CartViewSet, AuthView, CartDetail, UserDetail
+from .views import ProductViewSet, OrderViewSet, AuthView, CartDetail, UserDetail
 
 urlpatterns = [
     # /home
     # url(r'^catalogs/$', ItemList.as_view()),
     # /items
-    # url(r'^catalog-list/$', ItemViewSet.as_view({'get': 'list'})),
-    url(r'^catalog-item/(?P<catalogAlias>[\w-]+)$', ItemViewSet.as_view({'get': 'list'})),
+    # url(r'^catalog-list/$', ProductViewSet.as_view({'get': 'list'})),
+    url(r'^catalog-item/(?P<catalogAlias>[\w-]+)$', ProductViewSet.as_view({'get': 'list'})),
 
     # url(r'^orders$', OrdersViewSet.as_view({'get': 'list'})),
 
     url(r'^auth', AuthView.as_view()),
     url(r'^profile$', UserDetail.as_view()),
     url(r'^cart$', CartDetail.as_view()),
+    url(r'^order$', OrderViewSet.as_view({'get': 'list'})),
+    url(r'^order/(?P<order_id>[\d]+)$', OrderViewSet.as_view({'get': 'retrieve'})),
 
 
     # /catalog/:catalogAlias/:page?tags

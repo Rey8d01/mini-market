@@ -2,18 +2,18 @@
     <div class="col-md-12">
         <h3>Список товаров в корзине</h3>
 
-        <ul class="row" ng-repeat="product in cart.items">
-            <li>
+        <ul>
+            <li ng-repeat="product in cart.products">
                 {{product.title}}
                 {{product.amount}} руб. за шт.
                 <button type="button" class="btn btn-default btn-xs" ng-click="plusProductButton(product.id)">+</button>
-                <span>{{product.count_item}} шт.</span>
+                <span>{{product.count_product}} шт.</span>
                 <button type="button" class="btn btn-default btn-xs" ng-click="minusProductButton(product.id)">-</button>
-                <button type="button" class="btn btn-default btn-xs" ng-click="deleteProductButton(product.id, product.count_item)">Удалить</button>
+                <button type="button" class="btn btn-default btn-xs" ng-click="deleteProductButton(product.id, product.count_product)">Удалить</button>
             </li>
         </ul>
 
-        <p>Сумма заказа: №</p>
+        <p>Сумма заказа: <span>{{calculateAmount}}</span> руб.</p>
 
         <button type="button" class="btn btn-success" ng-click="confirmOrderButton()">Подтвердить заказ</button>
     </div>
