@@ -81,6 +81,9 @@ class Order(models.Model):
                     broken_order.delete()
         return order
 
+    def __str__(self):
+        return '#' + str(self.id) + ' от ' + str(self.user) + ' на сумму ' + str(self.fixed_amount) + ' статус ' + str(dict(self.STATES)[self.state])
+
 
 class OrderProduct(models.Model):
     """Товары в заказах."""
