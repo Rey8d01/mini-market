@@ -42,19 +42,27 @@ class Item(models.Model):
 
 class Order(models.Model):
     """Заказы (Корзина)."""
-    items = models.ManyToManyField(Item, through='OrderItem')
-    user = models.ForeignKey(User)
-    state = models.IntegerField(default=1)
-    fixed_amount = models.IntegerField(default=0)
-    create_time = models.DateTimeField(auto_now_add=True)
-    update_time = models.DateTimeField(auto_now=True)
-
     """Статусы заказов. Изменяются в зависимости действий пользователя или менеджера."""
     STATE_CART = 1
     STATE_CONFIRMED = 2
     STATE_SHIPPING = 3
     STATE_CANCEL = 4
     STATE_COMPLETE = 5
+
+    STATES = (
+        (STATE_CART, "Корзина"),
+        (STATE_CONFIRMED, "На обработке"),
+        (STATE_SHIPPING, "Отправлен"),
+        (STATE_CANCEL, "Отменен"),
+        (STATE_COMPLETE, "Завершен"),
+    )
+
+    items = models.ManyToManyField(Item, through='OrderItem')
+    user = models.ForeignKey(User)
+    state = models.IntegerField(default=STATE_CART, choices=STATES)
+    fixed_amount = models.IntegerField(default=0)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
 
     def get_cart(self, user):
         """Вернет модель заказа в статусе для корзины."""

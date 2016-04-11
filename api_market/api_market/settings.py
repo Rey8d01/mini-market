@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'backend'
+    'import_export',
+    'backend',
 ]
 
 AUTHENTICATION_BACKENDS = (
