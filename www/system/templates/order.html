@@ -5,16 +5,17 @@
         <ul class="row" ng-repeat="product in cart.items">
             <li>
                 {{product.title}}
-                <button type="button" class="btn btn-default btn-xs">+</button>
-                <span>#</span>
-                <button type="button" class="btn btn-default btn-xs">-</button>
-                <button type="button" class="btn btn-default btn-xs">Удалить</button>
+                {{product.amount}} руб. за шт.
+                <button type="button" class="btn btn-default btn-xs" ng-click="plusProductButton(product.id)">+</button>
+                <span>{{product.count_item}} шт.</span>
+                <button type="button" class="btn btn-default btn-xs" ng-click="minusProductButton(product.id)">-</button>
+                <button type="button" class="btn btn-default btn-xs" ng-click="deleteProductButton(product.id, product.count_item)">Удалить</button>
             </li>
         </ul>
 
         <p>Сумма заказа: №</p>
 
-        <button type="button" class="btn btn-success" ui-sref="main.order">Подтвердить заказ</button>
+        <button type="button" class="btn btn-success" ng-click="confirmOrderButton()">Подтвердить заказ</button>
     </div>
 </div>
 

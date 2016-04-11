@@ -12,13 +12,38 @@ chimera.system.market.controller("CartController", ["$scope", "cartService",
     }
 ]);
 
-chimera.system.market.controller("OrderController", ["$scope", "cartService",
-    function ($scope, cartService) {
+chimera.system.market.controller("OrderController", ["$scope", "$state", "cartService",
+    function ($scope, $state, cartService) {
         // Информация по корзине.
         $scope.cart = {};
         cartService.get({}, function(response) {
             $scope.cart = response;
         });
+
+        // Добавит 1 единицу товара.
+        $scope.plusProductButton = function(productId) {
+            cartService.save({product: productId, change: 1}, function(response) {
+                $scope.cart = response;
+            });
+        }
+        // Уберет 1 единицу товара.
+        $scope.minusProductButton = function(productId) {
+            cartService.save({product: productId, change: -1}, function(response) {
+                $scope.cart = response;
+            });
+        }
+        // Уберет товар из заказа.
+        $scope.deleteProductButton = function(productId, change) {
+            cartService.save({product: productId, change: -change}, function(response) {
+                $scope.cart = response;
+            });
+        };
+        // Подтверждение заказа.
+        $scope.confirmOrderButton = function() {
+            cartService.confirm({}, function(response) {
+                $state.go("main.profile");
+            });
+        }
     }
 ]);
 
@@ -46,16 +71,18 @@ chimera.system.market.controller("CatalogItemController", ["$scope", "$state", "
         // Информация по корзине.
         if ($scope.user.auth) {
             cartService.get({}, function(response) {
-                $scope.cart = response
-            })
+                $scope.cart = response;
+                $scope.$apply();
+            });
         }
 
         // Добавить товар в корзину.
         $scope.addToCart = function(productId) {
             if ($scope.user.auth) {
                 cartService.save({product: productId}, function(response) {
-                    $scope.cart = response
-                })
+                    $scope.cart = response;
+                    $scope.$apply();
+                });
             } else {
                 $.notify("Вам необходимо войти в систему под зарегистрированной учетной записью");
             }
@@ -83,6 +110,8 @@ chimera.system.market.factory("catalogListService", ["$resource",
 
 chimera.system.market.factory("cartService", ["$resource",
     function ($resource) {
-        return $resource("/cart");
+        return $resource("/cart", null, {
+            "confirm": {method:"PUT"}
+        });
     }
 ]);

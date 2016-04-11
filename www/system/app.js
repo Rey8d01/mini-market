@@ -228,6 +228,12 @@ chimera.system.main.controller("ChimeraController", ["$scope", "$state", "authSe
                 auth: true,
                 data: response.auth
             };
+
+            // После авторизации получение дополнительной информации - по корзине
+            cartService.get({}, function(response) {
+                $scope.cart = response;
+                $scope.$apply();
+            });
         }, function (response) {
             $scope.user = {
                 auth: false,

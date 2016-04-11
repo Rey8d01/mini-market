@@ -50,6 +50,7 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class CartDetail(generics.RetrieveUpdateDestroyAPIView):
+    """API работы с корзиной."""
     model = Order
     serializer_class = OrderSerializer
     permission_classes = [
@@ -57,24 +58,49 @@ class CartDetail(generics.RetrieveUpdateDestroyAPIView):
     ]
 
     def post(self, request, *args, **kwargs):
+        """Добавление товара в корзину."""
         product = self.request.data["product"]
+        try:
+            change = int(self.request.data["change"])
+        except KeyError:
+            change = 1
         product = Item.objects.get(pk=product)
         cart = self.get_object()
 
         try:
             order_item = OrderItem.objects.get(order=cart, item=product)
-            order_item.count_item += 1
+            order_item.count_item += change
         except OrderItem.DoesNotExist:
             order_item = OrderItem(order=cart, item=product)
-        order_item.save()
+
+        if order_item.count_item <= 0:
+            order_item.delete()
+        else:
+            order_item.save()
 
         return Response(OrderSerializer(cart).data)
 
     def put(self, request, *args, **kwargs):
-        print('put')
+        """Подтверждение статуса заказа пользователем."""
+        cart = self.get_object()
+        if cart.items.count():
+            cart.state = Order.STATE_CONFIRMED
+            cart.save()
+        else:
+            raise exceptions.APIException("В вашей корзине нет товаров")
+
+        return Response(OrderSerializer(cart).data)
+
+    def delete(self, request, *args, **kwargs):
+        """Отмена заказа, если он еще не отправлен."""
+        order_id = int(self.request.data["id"])
+        order = Order.objects.get(id=order_id, user=self.request.user, state=Order.STATE_CONFIRMED)
+        order.state = Order.STATE_CANCEL
+        order.save()
+        return Response(OrderSerializer(order).data)
 
     def get_queryset(self):
-        """Получение товаров в заказе со статусом 1 для авторизованного пользователя."""
+        """Получение товаров в заказе авторизованного пользователя."""
         user = self.request.user
         return Order.objects.filter(user=user)
 

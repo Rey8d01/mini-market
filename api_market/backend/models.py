@@ -71,16 +71,13 @@ class Order(models.Model):
         except self.DoesNotExist:
             order = Order(user=user, state=self.STATE_CART)
             order.save()
+        except self.MultipleObjectsReturned:
+            orders = Order.objects.filter(user=user, state=self.STATE_CART).all()
+            order = orders.last()
+            for broken_order in orders:
+                if order != broken_order:
+                    broken_order.delete()
         return order
-
-    def add_item_to_cart(self, product):
-        """Добавление товара к корзине пользователя."""
-        try:
-            order_item = OrderItem.objects.get(order=self, item=product)
-            order_item.count_item += 1
-        except OrderItem.DoesNotExist:
-            order_item = OrderItem(order=self, item=product)
-        order_item.save()
 
 
 class OrderItem(models.Model):
