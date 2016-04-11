@@ -1,0 +1,31 @@
+# public
+server {
+    listen 80;
+    charset utf-8;
+    root /path/to/mini-market/www;
+    server_name www.mini-market.local;
+    index index.html;
+    client_max_body_size 5M;
+
+    location / {
+        try_files $uri /index.html;
+    }
+
+    location ~ \.(js|css|ico|htm|html|json)$ {
+        try_files $uri =404;
+    }
+
+    location /_/ {
+        proxy_pass_header Server;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Scheme $scheme;
+        proxy_pass http://mini_market_backends;
+    }
+}
+
+# api
+upstream mini_market_backends {
+    server 127.0.0.1:8000;
+}
