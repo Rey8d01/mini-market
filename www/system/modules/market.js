@@ -1,8 +1,12 @@
+/**
+ * Модуль магазина.
+ * Работа с корзиной, поиск и оформление заказа.
+ */
 chimera.system.market = angular.module("market", ["ngResource", "ngSanitize"]);
 
+// Информация по корзине.
 chimera.system.market.controller("CartInfoController", ["$scope", "cartService",
     function ($scope, cartService) {
-        // Информация по корзине.
         $scope.cart = {};
         if ($scope.user.auth) {
             cartService.get({}, function(response) {
@@ -12,6 +16,7 @@ chimera.system.market.controller("CartInfoController", ["$scope", "cartService",
     }
 ]);
 
+// Оформление заказа.
 chimera.system.market.controller("CartController", ["$scope", "$state", "cartService",
     function ($scope, $state, cartService) {
         var calculateAmount = function(products) {
@@ -110,7 +115,7 @@ chimera.system.market.controller("CatalogListController", ["$scope", "$state", "
 
 chimera.system.market.factory("catalogItemService", ["$resource",
     function ($resource) {
-        return $resource("/catalog-item/:catalogAlias", {catalogAlias: "some", page: "1"});
+        return $resource("/catalog-products/:catalogAlias", {catalogAlias: "some", page: "1"});
     }
 ]);
 
@@ -120,6 +125,7 @@ chimera.system.market.factory("catalogListService", ["$resource",
     }
 ]);
 
+// Сервис по оформлению нового заказа.
 chimera.system.market.factory("cartService", ["$resource",
     function ($resource) {
         return $resource("/cart", null, {
@@ -128,6 +134,7 @@ chimera.system.market.factory("cartService", ["$resource",
     }
 ]);
 
+// Сервис по работе с существующими заказами.
 chimera.system.market.factory("orderService", ["$resource",
     function ($resource) {
         return $resource("/order/:orderId", {orderId: null});

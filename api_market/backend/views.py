@@ -34,6 +34,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    """Информация об авторизованном пользователе."""
     model = User
     serializer_class = UserSerializer
     permission_classes = [

@@ -21,7 +21,7 @@ urlpatterns = [
     # url(r'^catalogs/$', ItemList.as_view()),
     # /items
     # url(r'^catalog-list/$', ProductViewSet.as_view({'get': 'list'})),
-    url(r'^catalog-item/(?P<catalogAlias>[\w-]+)$', ProductViewSet.as_view({'get': 'list'})),
+    url(r'^catalog-products/(?P<catalog_alias>[\w-]+)$', ProductViewSet.as_view({'get': 'list'})),
 
     # url(r'^orders$', OrdersViewSet.as_view({'get': 'list'})),
 
