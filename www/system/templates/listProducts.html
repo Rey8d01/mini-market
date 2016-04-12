@@ -8,6 +8,9 @@
     </div>
     <div class="col-md-9">
         <h3>{{product.title}}</h3>
+        <p ng-if="product.tags.length">Метки: <span class="label label-info" ng-repeat="tag in product.tags">{{tag.title}}</span></p>
+        <br>
+        <p ng-if="product.description">Описание:</p>
         <div ng-bind-html="product.description"></div>
         <div><b>Стоимость {{product.amount}} руб.</b></div>
         <p class="lead">

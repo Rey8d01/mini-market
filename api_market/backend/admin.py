@@ -1,9 +1,10 @@
 from django.contrib import admin
-from .models import Order, Product, User, Catalog
+from .models import Order, Product, User, Catalog, Tag
 from import_export.admin import ImportExportMixin
 from import_export import resources
 
 admin.site.register(Catalog)
+admin.site.register(Tag)
 admin.site.register(Product)
 admin.site.register(User)
 

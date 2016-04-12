@@ -4,6 +4,8 @@
 
         <h3>{{catalog.title}}</h3>
 
+        <div ng-bind-html="catalog.description"></div>
+
         <div>
             <div list-products products="products" pagination-data="pageData" catalog-alias="catalog.alias"
                  state="main.catalog" add-to-cart="addToCart"></div>

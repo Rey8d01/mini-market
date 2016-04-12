@@ -36,6 +36,15 @@ class Catalog(models.Model):
         return self.title
 
 
+class Tag(models.Model):
+    """Теги."""
+    alias = models.CharField(max_length=200, unique=True)
+    title = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.title
+
+
 class Product(models.Model):
     """Товары."""
     title = models.CharField(max_length=200)
@@ -45,6 +54,7 @@ class Product(models.Model):
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
     catalog = models.ForeignKey(Catalog, null=True, blank=True, related_name='products')
+    tags = models.ManyToManyField(Tag)
 
     def __str__(self):
         return self.title
