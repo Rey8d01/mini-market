@@ -1,12 +1,11 @@
 <div class="row">
     <div class="col-md-8">
-        <h3>Список товаров</h3>
+        <h3>Список категорий</h3>
 
-        <h3>{{catalog.title}}</h3>
-
-        <div>
-            <div list-products products="products" pagination-data="pageData" catalog-alias="catalog.alias"
-                 state="main.catalog" add-to-cart="addToCart"></div>
+        <div class="row" ng-repeat="catalog in catalogs">
+            <div class="col-md-12">
+                <h4><a ui-sref="main.catalog({aliasCatalog: catalog.alias})">{{catalog.title}}</a></h4>
+            </div>
         </div>
     </div>
 

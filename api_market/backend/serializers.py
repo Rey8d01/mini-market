@@ -1,6 +1,12 @@
 """Сериализаторы для API."""
 from rest_framework import serializers
-from .models import Product, Order, User, OrderProduct
+from .models import Product, Order, User, OrderProduct, Catalog
+
+
+class CatalogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Catalog
+        fields = ('id', 'title', 'alias', 'description')
 
 
 class ProductSerializer(serializers.ModelSerializer):

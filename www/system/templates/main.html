@@ -7,8 +7,8 @@
                     <button ng-click="signoutButton()" type="button" class="btn btn-link"><i class="fa fa-sign-out"></i> Выход</button>
                 </div>
                 <div ng-if="!user.auth">
-                    <button ng-click="signinButton()" type="button" class="btn btn-link"><i class="fa fa-sign-out"></i> Войти</button>
-                    <button ng-click="signupButton()" type="button" class="btn btn-link"><i class="fa fa-sign-out"></i> Регистрация</button>
+                    <a ui-sref="signin" type="button" class="btn btn-link"><i class="fa fa-sign-out"></i> Войти</a>
+                    <a ui-sref="signup" type="button" class="btn btn-link"><i class="fa fa-sign-out"></i> Регистрация</a>
                 </div>
             </div>
         </div>

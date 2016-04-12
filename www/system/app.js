@@ -139,28 +139,27 @@ chimera.system.main.config(["$stateProvider", "$urlRouterProvider", "$locationPr
                     }
                 }
             })
-            .state("main.home", {
-                url: "/home",
-                views: {
-                    "content": {
-                        templateUrl: "/system/templates/catalogItem.html",
-                        controller: "CatalogItemController"
-                    },
-                }
-            })
 //            .state("main.home", {
 //                url: "/home",
 //                views: {
 //                    "content": {
-//                        templateUrl: "/system/templates/catalogList.html",
-//                        controller: "CatalogListController"
-//                    }
+//                        templateUrl: "/system/templates/catalogItem.html",
+//                        controller: "CatalogItemController"
+//                    },
 //                }
 //            })
+            .state("main.home", {
+                url: "/home",
+                views: {
+                    "content": {
+                        templateUrl: "/system/templates/catalogList.html",
+                        controller: "CatalogListController"
+                    }
+                }
+            })
             .state("main.catalog", {
                 url: "/catalog/:aliasCatalog/:page",
                 params: {
-                    "aliasCatalog": "some",
                     "page": "1"
                 },
                 views: {
@@ -234,14 +233,6 @@ chimera.system.main.controller("ChimeraController", ["$scope", "$state", "authSe
                 auth: false,
                 data: {}
             };
-        };
-
-        $scope.signinButton = function () {
-            $state.go("signin");
-        };
-
-        $scope.signupButton = function () {
-            $state.go("signup");
         };
     }
 ]);

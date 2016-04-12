@@ -2,18 +2,32 @@ from rest_framework import exceptions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets, generics, permissions
-from .serializers import ProductSerializer, OrderSerializer, UserSerializer
-from .models import Product, Order, User, OrderProduct
+from .serializers import ProductSerializer, OrderSerializer, UserSerializer, CatalogSerializer
+from .models import Product, Order, User, OrderProduct, Catalog
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import AnonymousUser
 
 
-class ProductViewSet(viewsets.ModelViewSet):
+class CatalogListViewSet(viewsets.ReadOnlyModelViewSet):
+    """Список каталогов."""
+    serializer_class = CatalogSerializer
+    queryset = Catalog.objects.filter()
+
+
+class CatalogItemViewSet(viewsets.ReadOnlyModelViewSet):
+    """Информация по каталогу."""
+    serializer_class = CatalogSerializer
+    lookup_field = 'alias'
+    queryset = Catalog.objects
+
+
+class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     """Список товаров в каталоге."""
     serializer_class = ProductSerializer
 
     def get_queryset(self):
-        return Product.objects.filter(is_active=True)
+        alias = self.kwargs["alias"]
+        return Product.objects.filter(is_active=True, catalog__alias=alias)
 
 
 class OrderViewSet(viewsets.ModelViewSet):

@@ -26,6 +26,16 @@ class User(AbstractBaseUser):
         return self.email
 
 
+class Catalog(models.Model):
+    """Каталоги товаров."""
+    alias = models.CharField(max_length=200, unique=True)
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.title
+
+
 class Product(models.Model):
     """Товары."""
     title = models.CharField(max_length=200)
@@ -34,7 +44,7 @@ class Product(models.Model):
     is_active = models.BooleanField(default=False)
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
-    # catalog = models.ForeignKey(CatalogProduct)
+    catalog = models.ForeignKey(Catalog, null=True, blank=True, related_name='products')
 
     def __str__(self):
         return self.title
@@ -90,22 +100,3 @@ class OrderProduct(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     count_product = models.IntegerField(default=1)
-
-
-class Catalog(models.Model):
-    """Каталоги товаров."""
-    alias = models.CharField(max_length=200)
-    title = models.CharField(max_length=200)
-    description = models.TextField()
-
-
-class CatalogProduct(models.Model):
-    """Закрепление товаров за каталогом.
-
-    Связь между каталогом и товаром 1-М можно обеспечить наличием соответствующего поля в модели Product,
-       однако данный вариант позволяет избавиться от null значений у товаров без категории. Кроме того
-       в данном виде возможен переход к связи М-М тем самым обеспечив нахождение товара в нескольких каталогах.
-
-    """
-    product = models.OneToOneField(Product)
-    catalog = models.ForeignKey(Catalog)

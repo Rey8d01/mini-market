@@ -14,14 +14,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-from .views import ProductViewSet, OrderViewSet, AuthView, CartDetail, UserDetail
+from .views import ProductViewSet, OrderViewSet, AuthView, CartDetail, UserDetail, CatalogListViewSet, CatalogItemViewSet
 
 urlpatterns = [
     # /home
     # url(r'^catalogs/$', ItemList.as_view()),
     # /items
-    # url(r'^catalog-list/$', ProductViewSet.as_view({'get': 'list'})),
-    url(r'^catalog-products/(?P<catalog_alias>[\w-]+)$', ProductViewSet.as_view({'get': 'list'})),
+    url(r'^catalog-list$', CatalogListViewSet.as_view({'get': 'list'})),
+    url(r'^catalog-item/(?P<alias>[\w-]+)$', CatalogItemViewSet.as_view({'get': 'retrieve'})),
+    url(r'^catalog-products/(?P<alias>[\w-]+)$', ProductViewSet.as_view({'get': 'list'})),
 
     # url(r'^orders$', OrdersViewSet.as_view({'get': 'list'})),
 
