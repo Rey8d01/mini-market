@@ -1,11 +1,18 @@
-from rest_framework import exceptions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import viewsets, generics, permissions
-from .serializers import ProductSerializer, OrderSerializer, UserSerializer, CatalogSerializer
-from .models import Product, Order, User, OrderProduct, Catalog
+from rest_framework.pagination import PageNumberPagination
+from rest_framework import exceptions, viewsets, generics, permissions
+from .serializers import ProductSerializer, OrderSerializer, UserSerializer, CatalogSerializer, TagSerializer
+from .models import Product, Order, User, OrderProduct, Catalog, Tag
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import AnonymousUser
+
+
+class ProductResultsSetPagination(PageNumberPagination):
+    """Перекрытие класса постраничной навигации для продуктов."""
+    page_size = 5
+    page_size_query_param = 'page_size'
+    max_page_size = 10
 
 
 class CatalogListViewSet(viewsets.ReadOnlyModelViewSet):
@@ -21,13 +28,24 @@ class CatalogItemViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Catalog.objects
 
 
-class ProductViewSet(viewsets.ReadOnlyModelViewSet):
+class TagsViewSet(viewsets.ReadOnlyModelViewSet):
+    """Список всех тегов."""
+    serializer_class = TagSerializer
+    queryset = Tag.objects.filter()
+
+
+class ProductsViewSet(viewsets.ReadOnlyModelViewSet):
     """Список товаров в каталоге."""
     serializer_class = ProductSerializer
+    pagination_class = ProductResultsSetPagination
 
     def get_queryset(self):
         alias = self.kwargs["alias"]
-        return Product.objects.filter(is_active=True, catalog__alias=alias)
+        try:
+            tags = self.request.query_params["tags"]
+            return Product.objects.filter(is_active=True, catalog__alias=alias, tags__alias=tags)
+        except KeyError:
+            return Product.objects.filter(is_active=True, catalog__alias=alias)
 
 
 class OrderViewSet(viewsets.ModelViewSet):

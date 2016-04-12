@@ -14,25 +14,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-from .views import ProductViewSet, OrderViewSet, AuthView, CartDetail, UserDetail, CatalogListViewSet, CatalogItemViewSet
+from .views import ProductsViewSet, OrderViewSet, AuthView, CartDetail, UserDetail, CatalogListViewSet, CatalogItemViewSet, TagsViewSet
 
 urlpatterns = [
-    # /home
-    # url(r'^catalogs/$', ItemList.as_view()),
-    # /items
     url(r'^catalog-list$', CatalogListViewSet.as_view({'get': 'list'})),
     url(r'^catalog-item/(?P<alias>[\w-]+)$', CatalogItemViewSet.as_view({'get': 'retrieve'})),
-    url(r'^catalog-products/(?P<alias>[\w-]+)$', ProductViewSet.as_view({'get': 'list'})),
-
-    # url(r'^orders$', OrdersViewSet.as_view({'get': 'list'})),
+    url(r'^tags$', TagsViewSet.as_view({'get': 'list'})),
+    url(r'^products/(?P<alias>[\w-]+)$', ProductsViewSet.as_view({'get': 'list'})),
 
     url(r'^auth', AuthView.as_view()),
     url(r'^profile$', UserDetail.as_view()),
     url(r'^cart$', CartDetail.as_view()),
     url(r'^order$', OrderViewSet.as_view({'get': 'list'})),
     url(r'^order/(?P<order_id>[\d]+)$', OrderViewSet.as_view({'get': 'retrieve'})),
-
-
-    # /catalog/:catalogAlias/:page?tags
-
 ]

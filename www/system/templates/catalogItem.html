@@ -7,6 +7,10 @@
         <div ng-bind-html="catalog.description"></div>
 
         <div>
+            <label ng-repeat="(title, alias) in tags">{{title}}: <input type="checkbox" ng-model="filtersCheckbox[alias]" ng-click="changeFilter()"> |&nbsp;</label>
+        </div>
+
+        <div>
             <div list-products products="products" pagination-data="pageData" catalog-alias="catalog.alias"
                  state="main.catalog" add-to-cart="addToCart"></div>
         </div>

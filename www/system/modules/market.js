@@ -25,7 +25,6 @@ chimera.system.market.controller("CartController", ["$scope", "$state", "cartSer
                 product = products[i];
                 amount += product.count_product * product.amount;
             }
-            console.log(amount);
             return amount;
         };
         // Информация по корзине.
@@ -66,32 +65,47 @@ chimera.system.market.controller("CartController", ["$scope", "$state", "cartSer
     }
 ]);
 
-chimera.system.market.controller("CatalogItemController", ["$scope", "$state", "catalogItemService", "cartService", "productsService",
-    function ($scope, $state, catalogItemService, cartService, productsService) {
-        var page = $state.params.page;
+// Просмотр отдельного каталога, фильтрация по тегам и выбор товаров в корзину
+chimera.system.market.controller("CatalogItemController", ["$scope", "$state", "catalogItemService", "cartService", "productsService", "tagsService",
+    function ($scope, $state, catalogItemService, cartService, productsService, tagsService) {
         $scope.catalog = {};
         $scope.products = {};
         $scope.pageData = {};
         $scope.cart = {};
+        $scope.tags = {};
+        $scope.filtersCheckbox = {};
 
-        console.log($state.params.aliasCatalog);
-        $scope.main.blogContentLoad = true;
+        var page = $state.params.page,
+            // Запрос на информацию по товарам - отдельная функция для реагирования на изменения в фильтрах.
+            getProducts = function() {
+                var tags = _.reduce($scope.filtersCheckbox, function(memo, value, key) { if (value) { memo.push(key); } return memo; }, []);
+                $scope.main.blogContentLoad = true;
+                productsService.get({aliasCatalog: $state.params.aliasCatalog, page: $state.params.page, tags: tags}, function (response) {
+                    $scope.pageData = {
+                        pageSize: 5,
+                        total: response.count,
+                        currentPage: page
+                    };
+                    $scope.products = response.results;
+                    $scope.main.blogContentLoad = false;
+                });
+            }
+
         // Информация по текущему каталогу.
-        catalogItemService.get({aliasCatalog: $state.params.aliasCatalog, page: $state.params.page}, function (response) {
+        catalogItemService.get({aliasCatalog: $state.params.aliasCatalog}, function (response) {
             $scope.catalog = response;
-            $scope.main.blogContentLoad = false;
+        });
+        // Информация по всем тегам.
+        tagsService.get({}, function (response) {
+            for (item in response.results) {
+                tag = response.results[item];
+                $scope.tags[tag.title] = tag.alias;
+                $scope.filtersCheckbox[tag.alias] = false;
+            }
+//            $scope.tags = response.results;
         });
         // Информация по списку товаров.
-        productsService.get({aliasCatalog: $state.params.aliasCatalog, page: $state.params.page}, function (response) {
-            $scope.pageData = {
-                pageSize: 2,
-                total: response.count,
-                currentPage: page
-            };
-            $scope.products = response.results;
-            $scope.main.blogContentLoad = false;
-        });
-
+        getProducts();
         // Информация по корзине.
         if ($scope.user.auth) {
             cartService.get({}, function(response) {
@@ -108,6 +122,10 @@ chimera.system.market.controller("CatalogItemController", ["$scope", "$state", "
             } else {
                 $.notify("Вам необходимо войти в систему под зарегистрированной учетной записью");
             }
+        }
+        // Изменение фильтров - запрос на новый поиск.
+        $scope.changeFilter = function() {
+            getProducts();
         }
     }
 ]);
@@ -133,9 +151,10 @@ chimera.system.market.controller("CatalogListController", ["$scope", "$state", "
     }
 ]);
 
+// Справочные сервисы по каталогам, тегам и товарам.
 chimera.system.market.factory("productsService", ["$resource",
     function ($resource) {
-        return $resource("/catalog-products/:aliasCatalog", {aliasCatalog: null, page: "1"});
+        return $resource("/products/:aliasCatalog", {aliasCatalog: null, page: "1"});
     }
 ]);
 
@@ -148,6 +167,12 @@ chimera.system.market.factory("catalogItemService", ["$resource",
 chimera.system.market.factory("catalogListService", ["$resource",
     function ($resource) {
         return $resource("/catalog-list");
+    }
+]);
+
+chimera.system.market.factory("tagsService", ["$resource",
+    function ($resource) {
+        return $resource("/tags");
     }
 ]);
 
