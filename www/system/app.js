@@ -139,15 +139,6 @@ chimera.system.main.config(["$stateProvider", "$urlRouterProvider", "$locationPr
                     }
                 }
             })
-//            .state("main.home", {
-//                url: "/home",
-//                views: {
-//                    "content": {
-//                        templateUrl: "/system/templates/catalogItem.html",
-//                        controller: "CatalogItemController"
-//                    },
-//                }
-//            })
             .state("main.home", {
                 url: "/home",
                 views: {

@@ -54,7 +54,7 @@ class Product(models.Model):
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
     catalog = models.ForeignKey(Catalog, null=True, blank=True, related_name='products')
-    tags = models.ManyToManyField(Tag)
+    tags = models.ManyToManyField(Tag, null=True, blank=True)
 
     def __str__(self):
         return self.title
